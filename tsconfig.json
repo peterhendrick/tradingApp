@@ -1,11 +1,12 @@
 {
-  "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2017",
-    "sourceMap": true
-  },
-  "exclude": [
-    "node_modules",
-    "typings"
-  ]
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ES6",
+        "sourceMap": true,
+        "outDir": "./dist/",
+        "baseUrl": "./src/"
+    },
+    "exclude": [
+        "node_modules"
+    ]
 }

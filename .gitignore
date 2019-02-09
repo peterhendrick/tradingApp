@@ -1,3 +1,4 @@
-local-config.ts
+src/local-config.ts
 .vscode
 node_modules
+dist
