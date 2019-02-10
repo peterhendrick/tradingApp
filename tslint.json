@@ -13,9 +13,8 @@
             true,
             "always"
         ],
-        "trailing-comma": [
-            false
-        ]
+        "trailing-comma": [false],
+        "curly": [false]
     },
     "rulesDirectory": []
 }
