@@ -1,86 +1,106 @@
 import { Pool } from 'pg';
 import { config } from './config';
 import { Request, Response } from 'express';
-import * as request from 'request-promise';
+import * as req from 'request-promise';
 const pool = new Pool(config);
 
 _getTickerAndSaveRates();
 setInterval(_getTickerAndSaveRates, 60000);
 
-const home = async (request: Request, response: Response) => {
+const home = async (req: Request, res: Response) => {
     const rates = await _getDatabaseRates();
-    response.json(rates);
+    res.json(rates);
 };
 
-const getUserById = async (request: Request, response: Response) => {
-    const id = parseInt(request.params.id, 10);
+const getUserById = async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id, 10);
 
     try {
         const results = await pool.query('SELECT * FROM users WHERE id = $1', [id])
-        response.status(200).json(results.rows.find(row => row.id === id));
+        res.status(200).json(results.rows.find(row => row.id === id));
     } catch (error) {
         throw error;
     }
 };
 
-const getUsers = async (request: Request, response: Response) => {
+const getUsers = async (req: Request, res: Response) => {
     try {
         const results = await pool.query('SELECT * FROM users ORDER BY id ASC')
-        response.status(200).json(results.rows);
+        res.status(200).json(results.rows);
     } catch (error) {
         throw error;
     }
 };
 
-const createUser = async (request: Request, response: Response) => {
-    const { name, email, password } = request.body;
-    if (!email || !password) return response.status(400).send(`${!email ? 'Email required ' : ''}${!password ? 'Password Required' : ''}`);
-    if (password.length !== 64) return response.status(400).send(`Invalid password: Must be a sha 256 hash.`);
+const createUser = async (req: Request, res: Response) => {
+    const { name, email, password } = req.body;
+    if (!email || !password) return res.status(400).send(`${!email ? 'Email required ' : ''}${!password ? 'Password Required' : ''}`);
+    if (password.length !== 64) return res.status(400).send(`Invalid password: Must be a sha 256 hash.`);
 
     try {
         const existingUserCheck = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (existingUserCheck.rowCount) return response.status(400).send(`User email is taken`);
-        const results = await pool.query('INSERT INTO users (name, email, password) VALUES ($1, $2, $3)', [name, email, password])
+        if (existingUserCheck.rowCount) return res.status(400).send(`User email is taken`);
+        await pool.query('INSERT INTO users (name, email, password) VALUES ($1, $2, $3)', [name, email, password])
         const idResponse = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
         const userId = idResponse.rows[0].id;
         await pool.query('INSERT INTO balances (xmr, ltc, doge, salt, usd, userid) VALUES (0, 0, 0, 0, 10000, $1)', [userId]);
-        response.status(201).send(`User added with id: ${userId}`);
+        res.status(201).send(`User added with id: ${userId}`);
     } catch (error) {
         throw error;
     }
 };
 
-const updateUser = async (request: Request, response: Response) => {
-    const id = parseInt(request.params.id, 10);
-    const { name, email } = request.body;
+const updateUser = async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id, 10);
+    const { name, email, password } = req.body;
 
     try {
         const results = await pool.query('UPDATE users SET name = $1, email = $2 WHERE id = $3', [name, email, id])
-        response.status(200).send(`User modified with ID: ${id}`);
+        res.status(200).send(`User modified with ID: ${id}`);
     } catch (error) {
         throw error;
     }
 };
 
-const deleteUser = async (request: Request, response: Response) => {
-    const id = parseInt(request.params.id, 10);
+const deleteUser = async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id, 10);
 
     try {
         const results = await pool.query('DELETE FROM users WHERE id = $1', [id])
-        response.status(200).send(`User deleted with ID: ${id}`);
+        res.status(200).send(`User deleted with ID: ${id}`);
     } catch (error) {
         throw error;
     }
+};
+
+const buyBTC = async (req: Request, res: Response) => {
+    const { userId, amount } = req.body;
+    const [usdBalance, usdRate] = await Promise.all([
+        pool.query('SELECT usd FROM balances WHERE userid = $1', [userId]),
+        pool.query('SELECT usd FROM rates WHERE id = 1')
+    ]);
+
+    console.log()
+
+};
+
+const sellBTC = async (req: Request, res: Response) => {
+    const { userId, amount } = req.body;
+};
+
+const tradeBtc = async (req: Request, res: Response) => {
+    const { userId, alt, amount } = req.body;
+
 };
 
 async function _getTickerAndSaveRates() {
     try {
         const [xmrRes, ltcRes, dogeRes, saltRes, usdRes] = await Promise.all([
-            request('https://www.ShapeShift.io/rate/btc_xmr'),
-            request('https://www.ShapeShift.io/rate/btc_ltc'),
-            request('https://www.ShapeShift.io/rate/btc_doge'),
-            request('https://www.ShapeShift.io/rate/btc_salt'),
-            request('https://api.coinbase.com/v2/prices/spot?currency=USD')
+            req('https://www.ShapeShift.io/rate/btc_xmr'),
+            req('https://www.ShapeShift.io/rate/btc_ltc'),
+            req('https://www.ShapeShift.io/rate/btc_doge'),
+            req('https://www.ShapeShift.io/rate/btc_salt'),
+            req('https://api.coinbase.com/v2/prices/spot?currency=USD')
         ]);
         const xmrRate = !xmrRes || JSON.parse(xmrRes).error ? null : JSON.parse(xmrRes).rate;
         const ltcRate = !ltcRes || JSON.parse(ltcRes).error ? null : JSON.parse(ltcRes).rate;
