@@ -14,7 +14,8 @@
             "always"
         ],
         "trailing-comma": [false],
-        "curly": [false]
+        "curly": [false],
+        "max-line-length": [true, 200]
     },
     "rulesDirectory": []
 }
