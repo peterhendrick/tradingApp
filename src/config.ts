@@ -1,6 +1,4 @@
-import { localConfig } from './local-config';
-
-export const config = localConfig ? localConfig : {
+export const config = {
     database: process.env.DB,
     host: process.env.HOST,
     password: process.env.DB_PASS,
