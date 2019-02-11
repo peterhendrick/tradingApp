@@ -20,11 +20,22 @@ function login(email, hashedPassword) {
 
     return fetch(`${config.apiUrl}/users/authenticate`, requestOptions)
         .then(handleResponse)
-        .then(user => {
-            // store user details and jwt token in local storage to keep user logged in between page refreshes
-            localStorage.setItem('user', JSON.stringify(user.text));
+        // .then(response => {
+        //     const user = response.text;
+        //     // store user details and jwt token in local storage to keep user logged in between page refreshes
 
-            return user;
+        //     return user;
+        // })
+        .then(response => {
+            const user = response.text;
+            return fetch(`${config.apiUrl}/balances/${user.id}`)
+                .then(handleResponse)
+                .then(response => {
+                    const balances = response.text;
+                    user.balances = balances;
+                    localStorage.setItem('user', JSON.stringify(user));
+                    return user;
+                });
         });
 }
 
