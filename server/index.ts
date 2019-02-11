@@ -16,7 +16,6 @@ app.use(
     })
 );
 
-app.get('/', routes.home);
 app.get('/users', routes.getUsers);
 app.post('/users/authenticate', routes.authenticateUser);
 app.get('/users/:id', routes.getUserById);
@@ -24,17 +23,7 @@ app.post('/users', routes.createUser);
 app.put('/users/:id', routes.updateUser);
 app.delete('/users/:id', routes.deleteUser);
 app.get('/balances/:id', routes.getBalancesById);
-
-// An api endpoint that returns a short list of items
-app.get('/api/getList', (req: express.Request, res: express.Response) => {
-    const list = ['item1', 'item2', 'item9'];
-    res.json(list);
-    console.log('Sent list of items');
-});
-
-app.get('/api/home', (req, res) => {
-    routes.home(req, res);
-});
+app.get('/rates', routes.getRates);
 
 // Handles any requests that don't match the ones above
 app.get('*', (req: express.Request, res: express.Response) => {
