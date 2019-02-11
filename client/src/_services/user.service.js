@@ -28,11 +28,18 @@ function login(email, hashedPassword) {
         // })
         .then(response => {
             const user = response.text;
-            return fetch(`${config.apiUrl}/balances/${user.id}`)
-                .then(handleResponse)
-                .then(response => {
-                    const balances = response.text;
+            return Promise.all([
+                fetch(`${config.apiUrl}/balances/${user.id}`),
+                fetch(`${config.apiUrl}/rates`)
+            ])
+                .then(dataArray => {
+                    return Promise.all([handleResponse(dataArray[0]), handleResponse(dataArray[1])])
+                })
+                .then(data => {
+                    const balances = data[0].text;
+                    const rates = data[1].text;
                     user.balances = balances;
+                    localStorage.setItem('rates', JSON.stringify(rates));
                     localStorage.setItem('user', JSON.stringify(user));
                     return user;
                 });
