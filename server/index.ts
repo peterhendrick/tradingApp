@@ -23,6 +23,7 @@ app.get('/users/:id', routes.getUserById);
 app.post('/users', routes.createUser);
 app.put('/users/:id', routes.updateUser);
 app.delete('/users/:id', routes.deleteUser);
+app.get('/balances/:id', routes.getBalancesById);
 
 // An api endpoint that returns a short list of items
 app.get('/api/getList', (req: express.Request, res: express.Response) => {
