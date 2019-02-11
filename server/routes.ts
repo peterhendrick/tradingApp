@@ -7,9 +7,10 @@ const pool = new Pool(config);
 _getTickerAndSaveRates();
 setInterval(_getTickerAndSaveRates, 60000);
 
-const home = async (req: Request, res: Response) => {
-    const rates = await _getDatabaseRates();
-    res.json(rates);
+const getRates = async (req: Request, res: Response) => {
+    const rates = await pool.query('SELECT * FROM rates ORDER BY id ASC')
+        .then(_handleDBResults);
+    res.json({ok: true, text: rates});
 };
 
 const getUserById = async (req: Request, res: Response) => {
@@ -116,8 +117,6 @@ const buyBTC = async (req: Request, res: Response) => {
         pool.query('SELECT usd FROM balances WHERE userid = $1', [userId]),
         pool.query('SELECT usd FROM rates WHERE id = 1')
     ]);
-
-
 };
 
 const sellBTC = async (req: Request, res: Response) => {
@@ -170,18 +169,13 @@ async function _saveRates(xmrRate, ltcRate, dogeRate, saltRate, usdRate) {
     [xmrRate, ltcRate, dogeRate, saltRate, usdRate]);
 }
 
-async function _getDatabaseRates() {
-    const ratesResponse = await pool.query('SELECT * FROM rates ORDER BY id ASC');
-    return ratesResponse.rows[0];
-}
-
 export const routes = {
     authenticateUser,
     createUser,
     deleteUser,
     getBalancesById,
+    getRates,
     getUserById,
     getUsers,
-    home,
     updateUser
 };
