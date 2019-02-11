@@ -23,6 +23,19 @@ const getUserById = async (req: Request, res: Response) => {
     }
 };
 
+const getBalancesById = async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id, 10);
+
+    try {
+        const balances = await pool.query('SELECT * FROM balances WHERE userid = $1', [id])
+            .then(_handleDBResults);
+        if (balances === '404') return res.status(404).json({message: `Balances not found for user with id: ${id}`});
+        res.status(200).json({ok: true, text: balances });
+    } catch (error) {
+        throw error;
+    }
+};
+
 const getUsers = async (req: Request, res: Response) => {
     try {
         const results = await pool.query('SELECT * FROM users ORDER BY id ASC');
@@ -104,7 +117,6 @@ const buyBTC = async (req: Request, res: Response) => {
         pool.query('SELECT usd FROM rates WHERE id = 1')
     ]);
 
-    console.log();
 
 };
 
@@ -156,7 +168,6 @@ async function _saveRates(xmrRate, ltcRate, dogeRate, saltRate, usdRate) {
 
     return await pool.query('UPDATE rates SET xmr = $1, ltc = $2, doge = $3, salt = $4, usd = $5 WHERE id = 1',
     [xmrRate, ltcRate, dogeRate, saltRate, usdRate]);
-    console.log();
 }
 
 async function _getDatabaseRates() {
@@ -168,6 +179,7 @@ export const routes = {
     authenticateUser,
     createUser,
     deleteUser,
+    getBalancesById,
     getUserById,
     getUsers,
     home,
