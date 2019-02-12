@@ -1,10 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import ModalRoot from '../App/ModalRoot';
+import { showModal, hideModal } from '../_actions/modal.actions';
 
 import { userActions } from '../_actions';
 
 class HomePage extends React.Component {
+    constructor(props) {
+        super(props)
+        this.closeModal = this.closeModal.bind(this);
+        this.onInputChange = this.onInputChange.bind(this);
+        this.openTradeModal = this.openTradeModal.bind(this);
+        this.showInput = this.showInput.bind(this);
+    }
+
     componentDidMount() {
         // this.props.dispatch(userActions.getAll());
     }
@@ -12,8 +22,33 @@ class HomePage extends React.Component {
     handleDeleteUser(id) {
         return (e) => this.props.dispatch(userActions.delete(id));
     }
+    closeModal(event) {
+        this.props.hideModal();
+    }
 
+    onInputChange(event) {
+        this.setState({
+            [event.target.name]: event.target.value
+        });
+    }
 
+    showInput(event) {
+        console.log(this.state);
+    }
+
+    openTradeModal(event) {
+        this.props.showModal({
+            open: true,
+            title: 'Trade Modal',
+            fields: [{
+                label: 'Address name',
+                name: 'addressName',
+                placeholder: 'Enter address name',
+            }],
+            onInputChange: this.onInputChange,
+            confirmAction: this.showInput
+        }, 'trade')
+    }
 
     render() {
         const { user } = this.props;
@@ -31,8 +66,14 @@ class HomePage extends React.Component {
                 <h4>salt: Δ{user.balances.salt}</h4>
                 <h4>doge: Ð{user.balances.doge}</h4>
                 <h4>usd: ${user.balances.usd}</h4>
-                <h4>Total Portfolio BTC Value: ₿{totalBTCValue}</h4>
+                <h4>Total Portfolio BTC Value: ₿{totalBTCValue.toFixed(8)}</h4>
                 <h4>Total Portfolio USD Value: ${totalUSDValue}</h4>
+                <div className="col">
+                    <button
+                        className="btn btn-outline-primary btn-block"
+                        onClick={this.openTradeModal}
+                    >Trade</button>
+                </div>
                 <h3>Current rates: </h3>
                 <h4>xmr: {rates.xmr} xmr/btc</h4>
                 <h4>ltc: {rates.ltc} ltc/btc</h4>
@@ -59,7 +100,9 @@ class HomePage extends React.Component {
                 <p>
                     <Link to="/login">Logout</Link>
                 </p>
+                <ModalRoot overlayClassName="modal fade show" bodyOpenClassName="modal-open" className="modal-dialog modal-dialog-centered" />
             </div>
+
         );
     }
 }
@@ -72,6 +115,13 @@ function mapStateToProps(state) {
     };
 }
 
+const mapDispatchToProps = dispatch => ({
+    hideModal: () => dispatch(hideModal()),
+    showModal: (modalProps, modalType) => {
+        dispatch(showModal({ modalProps, modalType }))
+    }
+})
+
 function _getBTCValue(balances, rates) {
     return Number(balances.btc) +
         (Number(balances.xmr) / Number(rates.xmr)) +
@@ -81,5 +131,5 @@ function _getBTCValue(balances, rates) {
         (Number(balances.usd) / Number(rates.usd));
 }
 
-const connectedHomePage = connect(mapStateToProps)(HomePage);
+const connectedHomePage = connect(mapStateToProps, mapDispatchToProps)(HomePage);
 export { connectedHomePage as HomePage };
