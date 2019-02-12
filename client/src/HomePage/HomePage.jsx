@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import ModalRoot from '../App/ModalRoot';
 import { showModal, hideModal } from '../_actions/modal.actions';
@@ -9,7 +9,6 @@ import { userActions } from '../_actions';
 class HomePage extends React.Component {
     constructor(props) {
         super(props)
-        this.closeModal = this.closeModal.bind(this);
         this.onInputChange = this.onInputChange.bind(this);
         this.openTradeModal = this.openTradeModal.bind(this);
         this.showInput = this.showInput.bind(this);
@@ -22,9 +21,6 @@ class HomePage extends React.Component {
     handleDeleteUser(id) {
         return (e) => this.props.dispatch(userActions.delete(id));
     }
-    closeModal(event) {
-        this.props.hideModal();
-    }
 
     onInputChange(event) {
         this.setState({
@@ -34,6 +30,7 @@ class HomePage extends React.Component {
 
     showInput(event) {
         console.log(this.state);
+        this.props.hideModal();
     }
 
     openTradeModal(event) {
@@ -52,6 +49,9 @@ class HomePage extends React.Component {
 
     render() {
         const { user } = this.props;
+        if (!user) {
+            return <Redirect to='/login' />
+        }
         const rates = JSON.parse(localStorage.getItem('rates'));
         const totalBTCValue = _getBTCValue(user.balances, rates);
         const totalUSDValue = totalBTCValue * Number(rates.usd);
@@ -100,7 +100,7 @@ class HomePage extends React.Component {
                 <p>
                     <Link to="/login">Logout</Link>
                 </p>
-                <ModalRoot overlayClassName="modal fade show" bodyOpenClassName="modal-open" className="modal-dialog modal-dialog-centered" />
+                <ModalRoot />
             </div>
 
         );
@@ -116,6 +116,8 @@ function mapStateToProps(state) {
 }
 
 const mapDispatchToProps = dispatch => ({
+    dispatch: dispatch,
+    logout: () => dispatch(userActions.logout()),
     hideModal: () => dispatch(hideModal()),
     showModal: (modalProps, modalType) => {
         dispatch(showModal({ modalProps, modalType }))
