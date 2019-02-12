@@ -13,20 +13,26 @@ class HomePage extends React.Component {
         return (e) => this.props.dispatch(userActions.delete(id));
     }
 
+
+
     render() {
         const { user } = this.props;
         const rates = JSON.parse(localStorage.getItem('rates'));
+        const totalBTCValue = _getBTCValue(user.balances, rates);
+        const totalUSDValue = totalBTCValue * Number(rates.usd);
         return (
             <div className="col-md-6 col-md-offset-3">
                 <h3>Hi {user.email}!</h3>
                 <p>You're logged in with React!!</p>
-                <h3>Your Balances: </h3>
+                <h3>Your Current Balances: </h3>
                 <h4>btc: ₿{user.balances.btc}</h4>
                 <h4>xmr: ɱ{user.balances.xmr}</h4>
                 <h4>ltc: Ł{user.balances.ltc}</h4>
                 <h4>salt: Δ{user.balances.salt}</h4>
                 <h4>doge: Ð{user.balances.doge}</h4>
                 <h4>usd: ${user.balances.usd}</h4>
+                <h4>Total Portfolio BTC Value: ₿{totalBTCValue}</h4>
+                <h4>Total Portfolio USD Value: ${totalUSDValue}</h4>
                 <h3>Current rates: </h3>
                 <h4>xmr: {rates.xmr} xmr/btc</h4>
                 <h4>ltc: {rates.ltc} ltc/btc</h4>
@@ -64,6 +70,15 @@ function mapStateToProps(state) {
     return {
         user
     };
+}
+
+function _getBTCValue(balances, rates) {
+    return Number(balances.btc) +
+        (Number(balances.xmr) / Number(rates.xmr)) +
+        (Number(balances.ltc) / Number(rates.ltc)) +
+        (Number(balances.salt) / Number(rates.salt)) +
+        (Number(balances.doge) / Number(rates.doge)) +
+        (Number(balances.usd) / Number(rates.usd));
 }
 
 const connectedHomePage = connect(mapStateToProps)(HomePage);
