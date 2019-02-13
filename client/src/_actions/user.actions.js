@@ -4,6 +4,8 @@ import { alertActions } from './';
 import { history } from '../_helpers';
 
 export const userActions = {
+    buyBtc,
+    sellBtc,
     login,
     logout,
     register,
@@ -75,6 +77,38 @@ function getAll() {
     function request() { return { type: userConstants.GETALL_REQUEST } }
     function success(users) { return { type: userConstants.GETALL_SUCCESS, users } }
     function failure(error) { return { type: userConstants.GETALL_FAILURE, error } }
+}
+
+function buyBtc(pair, amount, id) {
+    return dispatch => {
+        dispatch(request(pair, amount, id));
+
+        userService.buyBtc(pair, amount, id)
+            .then(
+                user => dispatch(success(user)),
+                error => dispatch(failure(id, error.toString()))
+            );
+    };
+
+    function request(id) { return { type: userConstants.BUY_REQUEST, id } }
+    function success(user) { return { type: userConstants.BUY_SUCCESS, user } }
+    function failure(id, error) { return { type: userConstants.BUY_FAILURE, id, error } }
+}
+
+function sellBtc(pair, amount, id) {
+    return dispatch => {
+        dispatch(request(pair, amount, id));
+
+        userService.sellBtc(pair, amount, id)
+            .then(
+                user => dispatch(success(user)),
+                error => dispatch(failure(id, error.toString()))
+            );
+    };
+
+    function request(id) { return { type: userConstants.SELL_REQUEST, id } }
+    function success(user) { return { type: userConstants.SELL_SUCCESS, user } }
+    function failure(id, error) { return { type: userConstants.SELL_FAILURE, id, error } }
 }
 
 // prefixed function name with underscore because delete is a reserved word in javascript
