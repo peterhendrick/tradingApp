@@ -13,39 +13,6 @@ const getRates = async (req: Request, res: Response) => {
     res.json({ok: true, text: rates});
 };
 
-const getUserById = async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id, 10);
-
-    try {
-        const results = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
-        res.status(200).json(results.rows.find((row: any) => row.id === id));
-    } catch (error) {
-        throw error;
-    }
-};
-
-const getBalancesById = async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id, 10);
-
-    try {
-        const balances = await pool.query('SELECT * FROM balances WHERE userid = $1', [id])
-            .then(_handleDBResults);
-        if (balances === '404') return res.status(404).json({message: `Balances not found for user with id: ${id}`});
-        res.status(200).json({ok: true, text: balances });
-    } catch (error) {
-        throw error;
-    }
-};
-
-const getUsers = async (req: Request, res: Response) => {
-    try {
-        const results = await pool.query('SELECT * FROM users ORDER BY id ASC');
-        res.status(200).json(results.rows);
-    } catch (error) {
-        throw error;
-    }
-};
-
 const createUser = async (req: Request, res: Response) => {
     const { username, hashedPassword } = req.body;
     if (!username || !hashedPassword) return res.status(400)
@@ -60,29 +27,6 @@ const createUser = async (req: Request, res: Response) => {
         await pool.query('INSERT INTO balances (btc, xmr, ltc, doge, salt, usd, userid) VALUES (0, 0, 0, 0, 0, 10000, $1)',
         [userId]);
         res.status(201).json({ok: true, text: `User ${username.toLowerCase()} added successfully. You can now login.`});
-    } catch (error) {
-        throw error;
-    }
-};
-
-const updateUser = async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id, 10);
-    const { name, username, password } = req.body;
-
-    try {
-        const results = await pool.query('UPDATE users SET username = $1 WHERE id = $2', [username.toLowerCase(), id]);
-        res.status(200).send(`User modified with ID: ${id}`);
-    } catch (error) {
-        throw error;
-    }
-};
-
-const deleteUser = async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id, 10);
-
-    try {
-        const results = await pool.query('DELETE FROM users WHERE id = $1', [id]);
-        res.status(200).send(`User deleted with ID: ${id}`);
     } catch (error) {
         throw error;
     }
@@ -202,11 +146,6 @@ export const routes = {
     authenticateUser,
     buyBtc,
     createUser,
-    deleteUser,
-    getBalancesById,
     getRates,
-    getUserById,
-    getUsers,
-    sellBtc,
-    updateUser
+    sellBtc
 };
