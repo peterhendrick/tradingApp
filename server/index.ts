@@ -24,6 +24,8 @@ app.put('/users/:id', routes.updateUser);
 app.delete('/users/:id', routes.deleteUser);
 app.get('/balances/:id', routes.getBalancesById);
 app.get('/rates', routes.getRates);
+app.put('/buyBtc', routes.buyBtc);
+app.put('/sellBtc', routes.sellBtc);
 
 // Handles any requests that don't match the ones above
 app.get('*', (req: express.Request, res: express.Response) => {

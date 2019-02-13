@@ -111,16 +111,52 @@ function _handleDBResults(results) {
     return '404';
 }
 
-const buyBTC = async (req: Request, res: Response) => {
-    const { userId, amount } = req.body;
-    const [usdBalance, usdRate] = await Promise.all([
-        pool.query('SELECT usd FROM balances WHERE userid = $1', [userId]),
-        pool.query('SELECT usd FROM rates WHERE id = 1')
-    ]);
+const buyBtc = async (req: Request, res: Response) => {
+    const { id, pair, amount } = req.body;
+    try {
+        const [userBalances, rates] = await Promise.all([
+            pool.query('SELECT * FROM balances WHERE userid = $1', [id]),
+            pool.query('SELECT * FROM rates WHERE id = 1')
+        ])
+        .then((data) => [_handleDBResults(data[0]), _handleDBResults(data[1])]);
+        const pairBalance = Number(userBalances[pair]);
+        const pairTradeAmount = Number(amount) * Number(rates[pair]);
+        const btcBalance = Number(userBalances.btc);
+        if (pairBalance >= pairTradeAmount) {
+            const pairAmount = pairBalance - pairTradeAmount;
+            const btcAmount = btcBalance + amount;
+            await pool.query(`UPDATE balances SET ${pair} = ${pairAmount.toString()}, btc = ${btcAmount.toString()} WHERE userid = ${id}`);
+            res.status(200).json({ok: true, text: 'Trade Successful'});
+        } else {
+            res.status(400).json({ok: true, text: ''});
+        }
+    } catch (error) {
+        throw error;
+    }
 };
 
-const sellBTC = async (req: Request, res: Response) => {
-    const { userId, amount } = req.body;
+const sellBtc = async (req: Request, res: Response) => {
+    const { id, pair, amount } = req.body;
+    try {
+        const [userBalances, rates] = await Promise.all([
+            pool.query('SELECT * FROM balances WHERE userid = $1', [id]),
+            pool.query('SELECT * FROM rates WHERE id = 1')
+        ])
+        .then((data) => [_handleDBResults(data[0]), _handleDBResults(data[1])]);
+        const pairBalance = Number(userBalances[pair]);
+        const pairTradeAmount = Number(amount) * Number(rates[pair]);
+        const btcBalance = Number(userBalances.btc);
+        if (btcBalance >= Number(amount)) {
+            const pairAmount = pairBalance + pairTradeAmount;
+            const btcAmount = btcBalance - amount;
+            await pool.query(`UPDATE balances SET ${pair} = ${pairAmount.toString()}, btc = ${btcAmount.toString()} WHERE userid = ${id}`);
+            res.status(200).json({ok: true, text: 'Trade Successful'});
+        } else {
+            res.status(400).json({ok: true, text: ''});
+        }
+    } catch (error) {
+        throw error;
+    }
 };
 
 async function _getTickerAndSaveRates() {
@@ -164,11 +200,13 @@ async function _saveRates(xmrRate, ltcRate, dogeRate, saltRate, usdRate) {
 
 export const routes = {
     authenticateUser,
+    buyBtc,
     createUser,
     deleteUser,
     getBalancesById,
     getRates,
     getUserById,
     getUsers,
+    sellBtc,
     updateUser
 };

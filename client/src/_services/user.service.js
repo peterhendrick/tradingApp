@@ -2,6 +2,8 @@ import config from 'config';
 import { authHeader } from '../_helpers';
 
 export const userService = {
+    buyBtc,
+    sellBtc,
     login,
     logout,
     register,
@@ -53,6 +55,24 @@ function getById(id) {
     };
 
     return fetch(`${config.apiUrl}/users/${id}`, requestOptions).then(handleResponse);
+}
+
+function buyBtc(pair, amount, id) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({id, amount, pair})
+    }
+    return fetch(`${config.apiUrl}/buyBtc`, requestOptions).then(handleResponse);
+}
+
+function sellBtc(pair, amount, id) {
+    const requestOptions = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({pair, amount, id})
+    }
+    return fetch(`${config.apiUrl}/sellBtc`, requestOptions).then(handleResponse);
 }
 
 function register(user) {
