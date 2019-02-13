@@ -16,13 +16,8 @@ app.use(
     })
 );
 
-app.get('/users', routes.getUsers);
 app.post('/users/authenticate', routes.authenticateUser);
-app.get('/users/:id', routes.getUserById);
 app.post('/users', routes.createUser);
-app.put('/users/:id', routes.updateUser);
-app.delete('/users/:id', routes.deleteUser);
-app.get('/balances/:id', routes.getBalancesById);
 app.get('/rates', routes.getRates);
 app.put('/buyBtc', routes.buyBtc);
 app.put('/sellBtc', routes.sellBtc);
