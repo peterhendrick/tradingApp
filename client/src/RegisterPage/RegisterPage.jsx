@@ -11,7 +11,7 @@ class RegisterPage extends React.Component {
 
         this.state = {
             user: {
-                email: '',
+                username: '',
                 password: ''
             },
             submitted: false
@@ -40,7 +40,7 @@ class RegisterPage extends React.Component {
         const { dispatch } = this.props;
         user.hashedPassword = crypto.createHash('sha256').update(user.password).digest('hex');
         delete user.password;
-        if (user.email && user.hashedPassword) {
+        if (user.username && user.hashedPassword) {
             dispatch(userActions.register(user));
         }
     }
@@ -52,11 +52,11 @@ class RegisterPage extends React.Component {
             <div className="col-md-6 col-md-offset-3">
                 <h2>Register</h2>
                 <form name="form" onSubmit={this.handleSubmit}>
-                    <div className={'form-group' + (submitted && !user.email ? ' has-error' : '')}>
-                        <label htmlFor="email">Email</label>
-                        <input type="text" className="form-control" name="email" value={user.email} onChange={this.handleChange} />
-                        {submitted && !user.email &&
-                            <div className="help-block">Email is required</div>
+                    <div className={'form-group' + (submitted && !user.username ? ' has-error' : '')}>
+                        <label htmlFor="username">Username</label>
+                        <input type="text" className="form-control" name="username" value={user.username} onChange={this.handleChange} />
+                        {submitted && !user.username &&
+                            <div className="help-block">Username is required</div>
                         }
                     </div>
                     <div className={'form-group' + (submitted && !user.password ? ' has-error' : '')}>

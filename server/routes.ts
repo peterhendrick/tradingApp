@@ -47,20 +47,19 @@ const getUsers = async (req: Request, res: Response) => {
 };
 
 const createUser = async (req: Request, res: Response) => {
-    const { email, hashedPassword } = req.body;
-    if (!email || !hashedPassword) return res.status(400)
-        .send(`${!email ? 'Email required ' : ''}${!hashedPassword ? 'Password Required' : ''}`);
+    const { username, hashedPassword } = req.body;
+    if (!username || !hashedPassword) return res.status(400)
+        .send(`${!username ? 'Username required ' : ''}${!hashedPassword ? 'Password Required' : ''}`);
     if (hashedPassword.length !== 64) return res.status(400).json({message: `Invalid password: Must be a sha 256 hash.`});
-
     try {
-        const existingUserCheck = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
-        if (existingUserCheck.rowCount) return res.status(400).json({message: `User email is taken`});
-        await pool.query('INSERT INTO users (email, password) VALUES ($1, $2)', [email, hashedPassword]);
-        const idResponse = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+        const existingUserCheck = await pool.query('SELECT * FROM users WHERE username = $1', [username.toLowerCase()]);
+        if (existingUserCheck.rowCount) return res.status(400).json({message: `User username is taken`});
+        await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username.toLowerCase(), hashedPassword]);
+        const idResponse = await pool.query('SELECT id FROM users WHERE username = $1', [username.toLowerCase()]);
         const userId = idResponse.rows[0].id;
         await pool.query('INSERT INTO balances (btc, xmr, ltc, doge, salt, usd, userid) VALUES (0, 0, 0, 0, 0, 10000, $1)',
         [userId]);
-        res.status(201).json({ok: true, text: `User ${email} added successfully`});
+        res.status(201).json({ok: true, text: `User ${username.toLowerCase()} added successfully. You can now login.`});
     } catch (error) {
         throw error;
     }
@@ -68,10 +67,10 @@ const createUser = async (req: Request, res: Response) => {
 
 const updateUser = async (req: Request, res: Response) => {
     const id = parseInt(req.params.id, 10);
-    const { name, email, password } = req.body;
+    const { name, username, password } = req.body;
 
     try {
-        const results = await pool.query('UPDATE users SET name = $1, email = $2 WHERE id = $3', [name, email, id])
+        const results = await pool.query('UPDATE users SET username = $1 WHERE id = $2', [username.toLowerCase(), id]);
         res.status(200).send(`User modified with ID: ${id}`);
     } catch (error) {
         throw error;
@@ -90,15 +89,15 @@ const deleteUser = async (req: Request, res: Response) => {
 };
 
 const authenticateUser = async (req: Request, res: Response) => {
-    const { email, hashedPassword } = req.body;
-    const user = await pool.query('SELECT * FROM users WHERE email = $1', [email])
+    const { username, hashedPassword } = req.body;
+    const user = await pool.query('SELECT * FROM users WHERE username = $1', [username.toLowerCase()])
         .then(_handleDBResults);
     if (user === '404' || user.password !== hashedPassword)
         return res.status(404).json({message: 'Username or password is incorrect'});
     const responseJson = {
-        email: user.email,
         id: user.id,
-        token: 'fake-jwt-token'
+        token: 'fake-jwt-token',
+        username: user.username
     };
     const response = { ok: true, text: responseJson };
     res.status(200).json(response);
@@ -123,11 +122,6 @@ const sellBTC = async (req: Request, res: Response) => {
     const { userId, amount } = req.body;
 };
 
-const tradeBtc = async (req: Request, res: Response) => {
-    const { userId, alt, amount } = req.body;
-
-};
-
 async function _getTickerAndSaveRates() {
     try {
         const [xmrRes, ltcRes, dogeRes, saltRes, usdRes] = await Promise.all([
@@ -144,8 +138,6 @@ async function _getTickerAndSaveRates() {
         const usdRate = !usdRes || JSON.parse(usdRes).error ? null : JSON.parse(usdRes).data.amount;
 
         const saveResults = await _saveRates(xmrRate, ltcRate, dogeRate, saltRate, usdRate);
-
-        console.log();
     } catch (error) {
         throw error;
     }

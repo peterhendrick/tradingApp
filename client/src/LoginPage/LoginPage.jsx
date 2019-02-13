@@ -13,7 +13,7 @@ class LoginPage extends React.Component {
         this.props.dispatch(userActions.logout());
 
         this.state = {
-            email: '',
+            username: '',
             password: '',
             submitted: false
         };
@@ -31,26 +31,26 @@ class LoginPage extends React.Component {
         e.preventDefault();
 
         this.setState({ submitted: true });
-        const { email, password } = this.state;
+        const { username, password } = this.state;
         const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
         const { dispatch } = this.props;
-        if (email && hashedPassword) {
-            dispatch(userActions.login(email, hashedPassword));
+        if (username && hashedPassword) {
+            dispatch(userActions.login(username, hashedPassword));
         }
     }
 
     render() {
         const { loggingIn } = this.props;
-        const { email, password, submitted } = this.state;
+        const { username, password, submitted } = this.state;
         return (
             <div className="col-md-6 col-md-offset-3">
                 <h2>Login</h2>
                 <form name="form" onSubmit={this.handleSubmit}>
-                    <div className={'form-group' + (submitted && !email ? ' has-error' : '')}>
-                        <label htmlFor="email">Email</label>
-                        <input type="text" className="form-control" name="email" value={email} onChange={this.handleChange} />
-                        {submitted && !email &&
-                            <div className="help-block">Email is required</div>
+                    <div className={'form-group' + (submitted && !username ? ' has-error' : '')}>
+                        <label htmlFor="username">Username</label>
+                        <input type="text" className="form-control" name="username" value={username} onChange={this.handleChange} />
+                        {submitted && !username &&
+                            <div className="help-block">Username is required</div>
                         }
                     </div>
                     <div className={'form-group' + (submitted && !password ? ' has-error' : '')}>

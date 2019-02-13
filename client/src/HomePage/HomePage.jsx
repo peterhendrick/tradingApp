@@ -57,7 +57,7 @@ class HomePage extends React.Component {
         const totalUSDValue = totalBTCValue * Number(rates.usd);
         return (
             <div className="col-md-6 col-md-offset-3">
-                <h3>Hi {user.email}!</h3>
+                <h3>Hi {user.username}!</h3>
                 <p>You're logged in with React!!</p>
                 <h3>Your Current Balances: </h3>
                 <h4>btc: ₿{user.balances.btc}</h4>
@@ -80,23 +80,6 @@ class HomePage extends React.Component {
                 <h4>salt: {rates.salt} salt/btc</h4>
                 <h4>doge: {rates.doge} doge/btc</h4>
                 <h4>usd: {rates.usd} usd/btc</h4>
-                {/* <h3>All registered users:</h3> */}
-                {/* {users.loading && <em>Loading users...</em>}
-                {users.error && <span className="text-danger">ERROR: {users.error}</span>}
-                {users.items &&
-                    <ul>
-                        {users.items.map((user, index) =>
-                            <li key={user.id}>
-                                {user.email}
-                                {
-                                    user.deleting ? <em> - Deleting...</em>
-                                    : user.deleteError ? <span className="text-danger"> - ERROR: {user.deleteError}</span>
-                                    : <span> - <a onClick={this.handleDeleteUser(user.id)}>Delete</a></span>
-                                }
-                            </li>
-                        )}
-                    </ul>
-                } */}
                 <p>
                     <Link to="/login">Logout</Link>
                 </p>
