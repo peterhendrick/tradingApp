@@ -54,7 +54,7 @@ class HomePage extends React.Component {
             fields: [{
                 label: event.target.name === 'buy' ? 'Coin to Sell' : 'Coin to Buy',
                 name: 'pair',
-                placeholder: 'Enter coin name to sell ("xmr", "ltc", "salt", "doge", "usd"',
+                placeholder: 'Enter coin name to sell ("xmr", "ltc", "salt", "doge", "usd")',
             }, {
                 label: event.target.name === 'buy' ? 'Bitcoin Amount to Buy' : 'Bitcoin Amount to Sell',
                 name: 'btc',
@@ -74,20 +74,20 @@ class HomePage extends React.Component {
         }
         const rates = JSON.parse(localStorage.getItem('rates'));
         const totalBTCValue = _getBTCValue(user.balances, rates);
-        const totalUSDValue = totalBTCValue * Number(rates.usd);
+        const totalUSDValue = Number(rates.usd) * totalBTCValue;
         return (
             <div className="col-md-6 col-md-offset-3">
                 <h3>Hi {user.username}!</h3>
                 <p>You're logged in with React!!</p>
                 <h3>Your Current Balances: </h3>
-                <h4>btc: ₿{user.balances.btc}</h4>
-                <h4>xmr: ɱ{user.balances.xmr}</h4>
-                <h4>ltc: Ł{user.balances.ltc}</h4>
-                <h4>salt: Δ{user.balances.salt}</h4>
-                <h4>doge: Ð{user.balances.doge}</h4>
-                <h4>usd: ${user.balances.usd}</h4>
+                <h4>btc: ₿{Number(user.balances.btc).toFixed(8)}</h4>
+                <h4>xmr: ɱ{Number(user.balances.xmr).toFixed(8)}</h4>
+                <h4>ltc: Ł{Number(user.balances.ltc).toFixed(8)}</h4>
+                <h4>salt: Δ{Number(user.balances.salt).toFixed(8)}</h4>
+                <h4>doge: Ð{Number(user.balances.doge).toFixed(8)}</h4>
+                <h4>usd: ${Number(user.balances.usd).toFixed(2)}</h4>
                 <h4>Total Portfolio BTC Value: ₿{totalBTCValue.toFixed(8)}</h4>
-                <h4>Total Portfolio USD Value: ${totalUSDValue}</h4>
+                <h4>Total Portfolio USD Value: ${totalUSDValue.toFixed(2)}</h4>
                 <div className="col">
                     <button
                         className="btn btn-outline-primary btn-block"
