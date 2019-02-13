@@ -90,11 +90,12 @@ const deleteUser = async (req: Request, res: Response) => {
 
 const authenticateUser = async (req: Request, res: Response) => {
     const { username, hashedPassword } = req.body;
-    const user = await pool.query('SELECT * FROM users WHERE username = $1', [username.toLowerCase()])
+    const user = await pool.query('SELECT * FROM users FULL OUTER JOIN balances ON users.id = balances.userid WHERE username = $1', [username.toLowerCase()])
         .then(_handleDBResults);
     if (user === '404' || user.password !== hashedPassword)
         return res.status(404).json({message: 'Username or password is incorrect'});
     const responseJson = {
+        balances: {xmr: user.xmr, btc: user.btc, ltc: user.ltc, salt: user.salt, doge: user.doge, usd: user.usd},
         id: user.id,
         token: 'fake-jwt-token',
         username: user.username
