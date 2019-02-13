@@ -11,7 +11,8 @@ class HomePage extends React.Component {
         super(props)
         this.onInputChange = this.onInputChange.bind(this);
         this.openTradeModal = this.openTradeModal.bind(this);
-        this.showInput = this.showInput.bind(this);
+        this.buyBtc = this.buyBtc.bind(this);
+        this.sellBtc = this.sellBtc.bind(this);
     }
 
     componentDidMount() {
@@ -28,9 +29,22 @@ class HomePage extends React.Component {
         });
     }
 
-    showInput(event) {
-        console.log(this.state);
+    buyBtc(event) {
+        event.preventDefault();
+        this.setState({ submitted: true });
+        this.props.dispatch(userActions.buyBtc(this.state.pair, this.state.btc, this.props.user.id));
         this.props.hideModal();
+    }
+
+    sellBtc(event) {
+        event.preventDefault();
+        this.setState({ submitted: true });
+        this.props.dispatch(userActions.sellBtc(this.state.pair, this.state.btc, this.props.user.id))
+        this.props.hideModal();
+        // return this.props.sellBtc(this.state.pair, this.state.btc, this.props.user.id)
+        //     .then(response => {
+        //         this.props.hideModal();
+        //     })
     }
 
     openTradeModal(event) {
@@ -38,12 +52,18 @@ class HomePage extends React.Component {
             open: true,
             title: 'Trade Modal',
             fields: [{
-                label: 'Address name',
-                name: 'addressName',
-                placeholder: 'Enter address name',
+                label: event.target.name === 'buy' ? 'Coin to Sell' : 'Coin to Buy',
+                name: 'pair',
+                placeholder: 'Enter coin name to sell ("xmr", "ltc", "salt", "doge", "usd"',
+            }, {
+                label: event.target.name === 'buy' ? 'Bitcoin Amount to Buy' : 'Bitcoin Amount to Sell',
+                name: 'btc',
+                placeholder: 'Enter bitcoin amount'
             }],
             onInputChange: this.onInputChange,
-            confirmAction: this.showInput
+            confirmAction: event.target.name === 'buy' ? this.buyBtc : this.sellBtc,
+            user: this.props.user,
+            crypto: this.tradeCrypto
         }, 'trade')
     }
 
@@ -71,8 +91,16 @@ class HomePage extends React.Component {
                 <div className="col">
                     <button
                         className="btn btn-outline-primary btn-block"
+                        name="buy"
                         onClick={this.openTradeModal}
-                    >Trade</button>
+                    >Buy BTC</button>
+                </div>
+                <div className="col">
+                    <button
+                        className="btn btn-outline-primary btn-block"
+                        name="sell"
+                        onClick={this.openTradeModal}
+                    >Sell BTC</button>
                 </div>
                 <h3>Current rates: </h3>
                 <h4>xmr: {rates.xmr} xmr/btc</h4>
@@ -100,6 +128,8 @@ function mapStateToProps(state) {
 
 const mapDispatchToProps = dispatch => ({
     dispatch: dispatch,
+    buyBtc: (pair, amount, id) => dispatch(userActions.buyBtc(pair, amount, id)),
+    sellBtc: (pair, amount, id) => dispatch(userActions.sellBtc(pair, amount, id)),
     logout: () => dispatch(userActions.logout()),
     hideModal: () => dispatch(hideModal()),
     showModal: (modalProps, modalType) => {
