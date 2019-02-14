@@ -1,12 +1,6 @@
 import React from 'react';
-import { pickBy } from 'lodash';
 
 export const TradeModal = ({ closeModal, confirmAction, title, fields, onRadioChange, onInputChange, user, tradeCrypto }) => {
-    const positiveUserBalanceCryptos = Object.keys(pickBy(user.balances, (value, key) => {
-        if (key !== 'btc' && Number(value) > 0) return true;
-    }));
-    // const positiveUserBalanceCryptos = ['usd', 'ltc'];
-
     return (
         <div className="modal-content">
             <div className="modal-header">
