@@ -68,7 +68,7 @@ function buyBtc(pair, amount, id) {
             const { user, rates } = response.text;
             localStorage.setItem('user', JSON.stringify(user));
             localStorage.setItem('rates', JSON.stringify(rates));
-            return user;
+            return { user, rates};
         });
 }
 
@@ -83,7 +83,7 @@ function sellBtc(pair, amount, id) {
             const { user, rates } = response.text;
             localStorage.setItem('user', JSON.stringify(user));
             localStorage.setItem('rates', JSON.stringify(rates));
-            return user;
+            return { user, rates};
         });}
 
 function register(user) {
