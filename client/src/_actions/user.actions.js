@@ -85,8 +85,12 @@ function buyBtc(pair, amount, id) {
 
         userService.buyBtc(pair, amount, id)
             .then(
-                ({ user, rates}) => dispatch(success(user, rates)),
-                error => {
+                ({ user, rates}) => {
+                    dispatch(success(user, rates));
+                    dispatch(alertActions.success(`Trade successful, you bought ${amount} BTC with ${pair}.`));
+                }
+            )
+            .catch(error => {
                     dispatch(failure(id, error.toString())),
                     dispatch(alertActions.error(error))
                 }
@@ -104,8 +108,11 @@ function sellBtc(pair, amount, id) {
 
         userService.sellBtc(pair, amount, id)
             .then(
-                ({ user, rates}) => dispatch(success(user, rates)),
-                error => {
+                ({ user, rates}) => {
+                    dispatch(success(user, rates)),
+                    dispatch(alertActions.success(`Trade successful, you sold ${amount} BTC for ${pair}.`));
+                }
+            ).catch(error => {
                     dispatch(failure(id, error.toString())),
                     dispatch(alertActions.error(error))
                 }
