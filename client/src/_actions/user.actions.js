@@ -91,8 +91,8 @@ function buyBtc(pair, amount, id) {
                 }
             )
             .catch(error => {
-                    dispatch(failure(id, error.toString())),
-                    dispatch(alertActions.error(error))
+                    dispatch(failure(id, error.toString()));
+                    dispatch(alertActions.error(error));
                 }
             );
     };
@@ -109,12 +109,12 @@ function sellBtc(pair, amount, id) {
         userService.sellBtc(pair, amount, id)
             .then(
                 ({ user, rates}) => {
-                    dispatch(success(user, rates)),
+                    dispatch(success(user, rates));
                     dispatch(alertActions.success(`Trade successful, you sold ${amount} BTC for ${pair}.`));
                 }
             ).catch(error => {
-                    dispatch(failure(id, error.toString())),
-                    dispatch(alertActions.error(error))
+                    dispatch(failure(id, error.toString()));
+                    dispatch(alertActions.error(error));
                 }
             );
     };
