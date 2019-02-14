@@ -4,11 +4,10 @@
   "description": "An app to trade fake cryptocurrency based on actual prices",
   "main": "index.js",
   "scripts": {
-    "test": "test",
     "build": "tsc",
     "dev": "ts-node ./src/index.ts",
     "start": "node ./dist/index.js",
-    "heroku-postbuild": "cd client && npm run build"
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "author": "Peter Hendrick",
   "license": "MIT",
