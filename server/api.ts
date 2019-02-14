@@ -4,7 +4,8 @@ import * as request from 'request-promise';
 import * as uuidV1 from 'uuid/v1';
 import { config } from './config';
 import { db } from './db';
-const pool = new Pool(config);
+const connectionString = process.env.DATABASE_URL;
+const pool = process.env.NODE_ENV === 'production' ? new Pool({ connectionString }) : new Pool(config);
 
 _init();
 setInterval(_getTickerAndSaveRates, 60000);
