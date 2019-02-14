@@ -1,4 +1,3 @@
-import config from 'config';
 import { authHeader } from '../_helpers';
 
 export const userService = {
@@ -21,8 +20,8 @@ function login(username, hashedPassword) {
     };
 
     return Promise.all([
-        fetch(`${config.apiUrl}/users/authenticate`, requestOptions),
-        fetch(`${config.apiUrl}/rates`)
+        fetch(`/users/authenticate`, requestOptions),
+        fetch(`/rates`)
     ])
         .then(data => Promise.all([handleResponse(data[0]), handleResponse(data[1])]))
         .then(response => {
@@ -45,7 +44,7 @@ function getAll() {
         headers: authHeader()
     };
 
-    return fetch(`${config.apiUrl}/users`, requestOptions).then(handleResponse);
+    return fetch(`/users`, requestOptions).then(handleResponse);
 }
 
 function getById(id) {
@@ -54,7 +53,7 @@ function getById(id) {
         headers: authHeader()
     };
 
-    return fetch(`${config.apiUrl}/users/${id}`, requestOptions).then(handleResponse);
+    return fetch(`/users/${id}`, requestOptions).then(handleResponse);
 }
 
 function buyBtc(pair, amount, id) {
@@ -63,7 +62,7 @@ function buyBtc(pair, amount, id) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({id, amount, pair})
     }
-    return fetch(`${config.apiUrl}/buyBtc`, requestOptions).then(handleResponse)
+    return fetch(`/buyBtc`, requestOptions).then(handleResponse)
         .then(response => {
             const { user, rates } = response.text;
             localStorage.setItem('user', JSON.stringify(user));
@@ -78,7 +77,7 @@ function sellBtc(pair, amount, id) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({pair, amount, id})
     }
-    return fetch(`${config.apiUrl}/sellBtc`, requestOptions).then(handleResponse)
+    return fetch(`/sellBtc`, requestOptions).then(handleResponse)
         .then(response => {
             const { user, rates } = response.text;
             localStorage.setItem('user', JSON.stringify(user));
@@ -93,7 +92,7 @@ function register(user) {
         body: JSON.stringify(user)
     };
 
-    return fetch(`${config.apiUrl}/users`, requestOptions).then(handleResponse);
+    return fetch(`/users`, requestOptions).then(handleResponse);
 }
 
 function update(user) {
@@ -103,7 +102,7 @@ function update(user) {
         body: JSON.stringify(user)
     };
 
-    return fetch(`${config.apiUrl}/users/${user.id}`, requestOptions).then(handleResponse);;
+    return fetch(`/users/${user.id}`, requestOptions).then(handleResponse);;
 }
 
 // prefixed function name with underscore because delete is a reserved word in javascript
@@ -113,7 +112,7 @@ function _delete(id) {
         headers: authHeader()
     };
 
-    return fetch(`${config.apiUrl}/users/${id}`, requestOptions).then(handleResponse);
+    return fetch(`/users/${id}`, requestOptions).then(handleResponse);
 }
 
 function handleResponse(response) {
@@ -123,7 +122,7 @@ function handleResponse(response) {
             if (response.status === 401) {
                 // auto logout if 401 response returned from api
                 logout();
-                location.reload(true);
+                location.reload(true); // eslint-disable-line no-restricted-globals
             }
 
             const error = (data && data.message) || response.statusText;
