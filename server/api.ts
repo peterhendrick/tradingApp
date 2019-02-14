@@ -48,13 +48,6 @@ const authenticateUser = async (req: Request, res: Response) => {
     res.status(200).json(response);
 };
 
-function _handleDBResults(results) {
-    if (results.rowCount) {
-        return results.rowCount === 1 ? results.rows[0] : results.rows;
-    }
-    return '404';
-}
-
 const buyBtc = async (req: Request, res: Response) => {
     const { id, pair, amount } = req.body;
     try {
@@ -121,6 +114,13 @@ const sellBtc = async (req: Request, res: Response) => {
     }
 };
 
+function _handleDBResults(results) {
+    if (results.rowCount) {
+        return results.rowCount === 1 ? results.rows[0] : results.rows;
+    }
+    return '404';
+}
+
 async function _getTickerAndSaveRates() {
     try {
         const [xmrRes, ltcRes, dogeRes, saltRes, usdRes] = await Promise.all([
@@ -160,7 +160,7 @@ async function _saveRates(xmrRate, ltcRate, dogeRate, saltRate, usdRate) {
         [xmrRate, ltcRate, dogeRate, saltRate, usdRate]);
 }
 
-export const routes = {
+export const api = {
     authenticateUser,
     buyBtc,
     createUser,
