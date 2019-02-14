@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { Pool } from 'pg';
 import * as request from 'request-promise';
+import * as uuidV1 from 'uuid/v1';
 import { config } from './config';
 import { db } from './db';
 const pool = new Pool(config);
@@ -25,13 +26,11 @@ const createUser = async (req: Request, res: Response) => {
         .send(`${!username ? 'Username required ' : ''}${!hashedPassword ? 'Password Required' : ''}`);
     if (hashedPassword.length !== 64) return res.status(400).json({ message: `Invalid password: Must be a sha 256 hash.` });
     try {
+        const uuid = uuidV1();
         const existingUserCheck = await pool.query('SELECT * FROM users WHERE username = $1', [username.toLowerCase()]);
         if (existingUserCheck.rowCount) return res.status(400).json({ message: `User username is taken` });
-        await pool.query('INSERT INTO users (username, password) VALUES ($1, $2)', [username.toLowerCase(), hashedPassword]);
-        const idResponse = await pool.query('SELECT id FROM users WHERE username = $1', [username.toLowerCase()]);
-        const userId = idResponse.rows[0].id;
-        await pool.query('INSERT INTO balances (btc, xmr, ltc, doge, salt, usd, userid) VALUES (0, 0, 0, 0, 0, 10000, $1)',
-            [userId]);
+        await pool.query('INSERT INTO users (id, username, password) VALUES ($1, $2, $3)', [uuid, username.toLowerCase(), hashedPassword]);
+        await pool.query('INSERT INTO balances (btc, xmr, ltc, doge, salt, usd, userid) VALUES (0, 0, 0, 0, 0, 10000, $1)', [uuid]);
         res.status(201).json({ ok: true, text: `User ${username.toLowerCase()} added successfully. You can now login.` });
     } catch (error) {
         throw error;
@@ -68,9 +67,9 @@ const buyBtc = async (req: Request, res: Response) => {
         if (pairBalance >= pairTradeAmount) {
             const pairAmount = pairBalance - pairTradeAmount;
             const btcAmount = btcBalance + Number(amount);
-            const userBalance = await pool.query(`UPDATE balances SET ${pair} = ${pairAmount.toString()}, btc = ${btcAmount.toString()} WHERE userid = ${id} RETURNING *`)
+            const userBalance = await pool.query(`UPDATE balances SET ${pair} = ${pairAmount.toString()}, btc = ${btcAmount.toString()} WHERE userid = $1 RETURNING *`, [id])
                 .then(_handleDBResults);
-            let user = await pool.query(`SELECT * FROM users FULL OUTER JOIN balances ON users.id = balances.userid WHERE id = ${userBalance.userid}`)
+            let user = await pool.query(`SELECT * FROM users FULL OUTER JOIN balances ON users.id = balances.userid WHERE id = $1`, [userBalance.userid])
                 .then(_handleDBResults);
             user = {
                 balances: { xmr: user.xmr, btc: user.btc, ltc: user.ltc, salt: user.salt, doge: user.doge, usd: user.usd },
@@ -101,9 +100,9 @@ const sellBtc = async (req: Request, res: Response) => {
         if (btcBalance >= Number(amount)) {
             const pairAmount = pairBalance + pairTradeAmount;
             const btcAmount = btcBalance - Number(amount);
-            const userBalance = await pool.query(`UPDATE balances SET ${pair} = ${pairAmount.toString()}, btc = ${btcAmount.toString()} WHERE userid = ${id} RETURNING *`)
+            const userBalance = await pool.query(`UPDATE balances SET ${pair} = ${pairAmount.toString()}, btc = ${btcAmount.toString()} WHERE userid = $1 RETURNING *`, [id])
                 .then(_handleDBResults);
-            let user = await pool.query(`SELECT * FROM users FULL OUTER JOIN balances ON users.id = balances.userid WHERE id = ${userBalance.userid}`)
+            let user = await pool.query(`SELECT * FROM users FULL OUTER JOIN balances ON users.id = balances.userid WHERE id = $1`, [userBalance.userid])
                 .then(_handleDBResults);
             user = {
                 balances: { xmr: user.xmr, btc: user.btc, ltc: user.ltc, salt: user.salt, doge: user.doge, usd: user.usd },
