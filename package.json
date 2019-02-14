@@ -7,7 +7,7 @@
     "build": "tsc",
     "dev": "ts-node ./src/index.ts",
     "start": "node ./dist/index.js",
-    "heroku-postbuild": "cd client && npm install && npm run build"
+    "heroku-postbuild": "tsc && cd client && npm install && npm run build"
   },
   "author": "Peter Hendrick",
   "license": "MIT",
