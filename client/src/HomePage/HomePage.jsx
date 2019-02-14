@@ -68,11 +68,10 @@ class HomePage extends React.Component {
     }
 
     render() {
-        const { user } = this.props;
+        const { user, rates } = this.props;
         if (!user) {
             return <Redirect to='/login' />
         }
-        const rates = JSON.parse(localStorage.getItem('rates'));
         const totalBTCValue = _getBTCValue(user.balances, rates);
         const totalUSDValue = Number(rates.usd) * totalBTCValue;
         return (
@@ -120,9 +119,12 @@ class HomePage extends React.Component {
 
 function mapStateToProps(state) {
     const { authentication } = state;
-    const { user } = authentication;
+    let { user, rates } = authentication;
+    if (!user) user = JSON.parse(localStorage.getItem('user'));
+    if (!rates) rates = JSON.parse(localStorage.getItem('rates'));
     return {
-        user
+        user,
+        rates
     };
 }
 
