@@ -77,7 +77,6 @@ class HomePage extends React.Component {
         return (
             <div className="col-md-6 col-md-offset-3">
                 <h3>Hi {user.username}!</h3>
-                <p>You're logged in with React!!</p>
                 <h3>Your Current Balances: </h3>
                 <h4>btc: ₿{Number(user.balances.btc).toFixed(8)}</h4>
                 <h4>xmr: ɱ{Number(user.balances.xmr).toFixed(8)}</h4>
@@ -87,6 +86,12 @@ class HomePage extends React.Component {
                 <h4>usd: ${Number(user.balances.usd).toFixed(2)}</h4>
                 <h4>Total Portfolio BTC Value: ₿{totalBTCValue.toFixed(8)}</h4>
                 <h4>Total Portfolio USD Value: ${totalUSDValue.toFixed(2)}</h4>
+                <h3>Current rates: </h3>
+                <h4>xmr: {rates.xmr} xmr/btc</h4>
+                <h4>ltc: {rates.ltc} ltc/btc</h4>
+                <h4>salt: {rates.salt} salt/btc</h4>
+                <h4>doge: {rates.doge} doge/btc</h4>
+                <h4>usd: {rates.usd} usd/btc</h4>
                 <div className="col">
                     <button
                         className="btn btn-outline-primary btn-block"
@@ -101,12 +106,6 @@ class HomePage extends React.Component {
                         onClick={this.openTradeModal}
                     >Sell BTC</button>
                 </div>
-                <h3>Current rates: </h3>
-                <h4>xmr: {rates.xmr} xmr/btc</h4>
-                <h4>ltc: {rates.ltc} ltc/btc</h4>
-                <h4>salt: {rates.salt} salt/btc</h4>
-                <h4>doge: {rates.doge} doge/btc</h4>
-                <h4>usd: {rates.usd} usd/btc</h4>
                 <p>
                     <Link to="/login">Logout</Link>
                 </p>
