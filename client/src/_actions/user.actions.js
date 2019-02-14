@@ -19,8 +19,8 @@ function login(username, password) {
 
         userService.login(username, password)
             .then(
-                user => {
-                    dispatch(success(user));
+                ({user, rates}) => {
+                    dispatch(success(user, rates));
                     history.push('/');
                 },
                 error => {
@@ -31,7 +31,7 @@ function login(username, password) {
     };
 
     function request(user) { return { type: userConstants.LOGIN_REQUEST, user } }
-    function success(user) { return { type: userConstants.LOGIN_SUCCESS, user } }
+    function success(user, rates) { return { type: userConstants.LOGIN_SUCCESS, user, rates } }
     function failure(error) { return { type: userConstants.LOGIN_FAILURE, error } }
 }
 
@@ -85,13 +85,13 @@ function buyBtc(pair, amount, id) {
 
         userService.buyBtc(pair, amount, id)
             .then(
-                user => dispatch(success(user)),
+                ({ user, rates}) => dispatch(success(user, rates)),
                 error => dispatch(failure(id, error.toString()))
             );
     };
 
     function request(id) { return { type: userConstants.BUY_REQUEST, id } }
-    function success(user) { return { type: userConstants.BUY_SUCCESS, user } }
+    function success(user, rates) { return { type: userConstants.BUY_SUCCESS, user, rates } }
     function failure(id, error) { return { type: userConstants.BUY_FAILURE, id, error } }
 }
 
@@ -101,13 +101,13 @@ function sellBtc(pair, amount, id) {
 
         userService.sellBtc(pair, amount, id)
             .then(
-                user => dispatch(success(user)),
+                ({ user, rates}) => dispatch(success(user, rates)),
                 error => dispatch(failure(id, error.toString()))
             );
     };
 
     function request(id) { return { type: userConstants.SELL_REQUEST, id } }
-    function success(user) { return { type: userConstants.SELL_SUCCESS, user } }
+    function success(user, rates) { return { type: userConstants.SELL_SUCCESS, user, rates } }
     function failure(id, error) { return { type: userConstants.SELL_FAILURE, id, error } }
 }
 
