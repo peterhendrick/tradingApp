@@ -81,7 +81,7 @@ const buyBtc = async (req: Request, res: Response) => {
             };
             res.status(200).json({ ok: true, text: { user, rates } });
         } else {
-            res.status(400).json({ ok: false, text: `You do not have enough ${pair} to make trade.` });
+            res.status(400).json({ ok: false, message: `You do not have enough ${pair} to make trade.` });
         }
     } catch (error) {
         throw error;
@@ -114,7 +114,7 @@ const sellBtc = async (req: Request, res: Response) => {
             };
             res.status(200).json({ ok: true, text: { user, rates } });
         } else {
-            res.status(400).json({ ok: false, text: 'Not enough BTC to make trade.' });
+            res.status(400).json({ ok: false, message: `You do not have enough BTC to make trade.` });
         }
     } catch (error) {
         throw error;
