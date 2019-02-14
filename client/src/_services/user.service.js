@@ -30,7 +30,7 @@ function login(username, hashedPassword) {
             const rates = response[1].text;
             localStorage.setItem('rates', JSON.stringify(rates));
             localStorage.setItem('user', JSON.stringify(user));
-            return user;
+            return { user, rates };
         });
 }
 
@@ -63,7 +63,13 @@ function buyBtc(pair, amount, id) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({id, amount, pair})
     }
-    return fetch(`${config.apiUrl}/buyBtc`, requestOptions).then(handleResponse);
+    return fetch(`${config.apiUrl}/buyBtc`, requestOptions).then(handleResponse)
+        .then(response => {
+            const { user, rates } = response.text;
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('rates', JSON.stringify(rates));
+            return user;
+        });
 }
 
 function sellBtc(pair, amount, id) {
@@ -72,8 +78,13 @@ function sellBtc(pair, amount, id) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({pair, amount, id})
     }
-    return fetch(`${config.apiUrl}/sellBtc`, requestOptions).then(handleResponse);
-}
+    return fetch(`${config.apiUrl}/sellBtc`, requestOptions).then(handleResponse)
+        .then(response => {
+            const { user, rates } = response.text;
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('rates', JSON.stringify(rates));
+            return user;
+        });}
 
 function register(user) {
     const requestOptions = {
