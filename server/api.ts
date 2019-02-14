@@ -2,10 +2,16 @@ import { Request, Response } from 'express';
 import { Pool } from 'pg';
 import * as request from 'request-promise';
 import { config } from './config';
+import { db } from './db';
 const pool = new Pool(config);
 
-_getTickerAndSaveRates();
+_init();
 setInterval(_getTickerAndSaveRates, 60000);
+
+async function _init() {
+    await db.initializeDatabaseTables();
+    await _getTickerAndSaveRates();
+}
 
 const getRates = async (req: Request, res: Response) => {
     const rates = await pool.query('SELECT * FROM rates ORDER BY id ASC')
