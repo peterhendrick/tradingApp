@@ -16,33 +16,6 @@ export function users(state = {}, action) {
             return {
                 error: action.error
             };
-        case userConstants.BUY_REQUEST:
-            return {
-                loading: true
-            };
-        case userConstants.BUY_SUCCESS:
-            return {
-                items: action.user
-            };
-        case userConstants.BUY_FAILURE:
-            return {
-                userid: action.id,
-                error: action.error
-            };
-            case userConstants.BUY_REQUEST:
-        case userConstants.SELL_REQUEST:
-            return {
-                loading: true
-            };
-        case userConstants.SELL_SUCCESS:
-            return {
-                items: action.user
-            };
-        case userConstants.SELL_FAILURE:
-            return {
-                userid: action.id,
-                error: action.error
-            };
         case userConstants.DELETE_REQUEST:
             // add 'deleting:true' property to user being deleted
             return {
