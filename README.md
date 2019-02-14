@@ -1,7 +1,7 @@
 PERN Full Stack fake cryptocurrency trading app
 =======
 
-tradingApp is a website where you can register to login and make fake trades between btc, ltc, xmr, salt, doge and usd.
+tradingApp is a website where you can register to login and make fake trades between btc, ltc, xmr, salt, doge and usd. It is built using Postgres, Express, React - Redux, and Node.js
 
 For a live example of this full stack app running visit https://cryptotradingapp.herokuapp.com/
 
@@ -42,5 +42,5 @@ DB_USER  - the username of your database user.
 
 The app will run on port 5000. To use the app visit localhost:5000 and click register. Enter a username and password (passwords are hashed on the client and stored hashed in the database. Plaintext passwords are not sent to the server). Once registered, you can then login.
 
-Each account will be given a fake $10000 usd to begin trading. All trades must use BTC. Once you have BTC, you can trade among other cryptos or back to usd. Current rates are fetched on the server through the Shapeshift API (cryptos) and the Coinbase API (usd).
+Each account will be given a fake $10000 usd to begin trading. All trades must use BTC. Once you have BTC, you can trade among other cryptos or back to usd. Current rates are updated every 60 seconds on the server through the Shapeshift API (cryptos) and the Coinbase API (usd).
 
