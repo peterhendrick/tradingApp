@@ -1,6 +1,7 @@
 import { Pool } from 'pg';
 import { config } from './config';
-const pool = new Pool(config);
+const connectionString = process.env.DATABASE_URL;
+const pool = process.env.NODE_ENV === 'Production' ? new Pool({ connectionString }) : new Pool(config);
 
 function initializeDatabaseTables() {
     return Promise.all([
