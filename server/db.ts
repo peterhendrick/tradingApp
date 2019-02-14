@@ -3,8 +3,9 @@ import { config } from './config';
 const pool = new Pool(config);
 
 function initializeDatabaseTables() {
-    return Promise.all([pool.query(`CREATE TABLE IF NOT EXISTS users (
-            id  int   PRIMARY KEY,
+    return Promise.all([
+        pool.query(`CREATE TABLE IF NOT EXISTS users (
+            id  uuid   PRIMARY KEY,
             username    text,
             password    text
         );`),
@@ -17,7 +18,8 @@ function initializeDatabaseTables() {
             usd    text
         );`),
         pool.query(`CREATE TABLE IF NOT EXISTS balances (
-            userid  int   PRIMARY KEY,
+            userid  uuid   PRIMARY KEY,
+            btc    text,
             xmr    text,
             ltc    text,
             salt    text,
