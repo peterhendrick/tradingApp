@@ -49,7 +49,7 @@ function register(user) {
                 user => {
                     dispatch(success());
                     history.push('/login');
-                    dispatch(alertActions.success('Registration successful'));
+                    dispatch(alertActions.success('Registration successful, you may now log in.'));
                 },
                 error => {
                     dispatch(failure(error.toString()));
@@ -86,7 +86,10 @@ function buyBtc(pair, amount, id) {
         userService.buyBtc(pair, amount, id)
             .then(
                 ({ user, rates}) => dispatch(success(user, rates)),
-                error => dispatch(failure(id, error.toString()))
+                error => {
+                    dispatch(failure(id, error.toString())),
+                    dispatch(alertActions.error(error))
+                }
             );
     };
 
@@ -102,7 +105,10 @@ function sellBtc(pair, amount, id) {
         userService.sellBtc(pair, amount, id)
             .then(
                 ({ user, rates}) => dispatch(success(user, rates)),
-                error => dispatch(failure(id, error.toString()))
+                error => {
+                    dispatch(failure(id, error.toString())),
+                    dispatch(alertActions.error(error))
+                }
             );
     };
 
